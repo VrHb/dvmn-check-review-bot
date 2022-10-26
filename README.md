@@ -34,7 +34,7 @@ echo "DVNM_TOKEN"=<токен API devman>" >> .env
 ```
 echo "TG_TOKEN"=<токен бота>" >> .env 
 ```
-3. ID вашего чата, можно получить в кодес помощью `print(bot.get_me())`
+3. ID вашего чата, можно получить в коде с помощью `print(bot.get_me())`
 ```
 echo ""=<ID чата>" >> .env 
 ```
