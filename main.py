@@ -5,14 +5,12 @@ from dotenv import load_dotenv
 import requests
 import telegram
 
-from loguru import logger
 
 
-url_list = "https://dvmn.org/api/user_reviews/"
-url_longpolling = "https://dvmn.org/api/long_polling/"
+URL = "https://dvmn.org/api/long_polling/"
 
 
-def get_devman_userrewiews_info(url, token, *args):
+def get_devman_rewiews_status(url, token, *args):
     response = requests.get(url, headers=token)
     response.raise_for_status()
     return response.json()
@@ -30,16 +28,15 @@ if __name__ == "__main__":
     updates = bot.get_updates()
     try: 
         while True:
-            polling_response = get_devman_userrewiews_info(
-                url_longpolling, autorization_header, params
+            response = get_devman_rewiews_status(
+                URL, autorization_header, params
             )
-            logger.info(polling_response)
-            timestamp = polling_response.get("timestamp_to_request")
-            status = polling_response.get("status")
+            timestamp = response.get("timestamp_to_request")
+            status = response.get("status")
             if status == "found":
-                remark = polling_response["new_attempts"][0]["is_negative"]
-                lesson_url = polling_response["new_attempts"][0]["lesson_url"]
-                lesson = polling_response["new_attempts"][0]["lesson_title"]
+                remark = response["new_attempts"][0]["is_negative"]
+                lesson_url = response["new_attempts"][0]["lesson_url"]
+                lesson = response["new_attempts"][0]["lesson_title"]
                 if remark:
                     bot.send_message(
                         text=f"Преподаватель проверил работу *{lesson}* {lesson_url}\n\n К сожалению, в работе нашлись ошибки!",
@@ -52,8 +49,6 @@ if __name__ == "__main__":
                         chat_id=os.getenv("CHAT_ID"),
                         parse_mode="Markdown"
                         )
-            logger.info(timestamp)
-            logger.info(updates[0].message.from_user.id)
             params = {
                 "timestamp": timestamp
             }
