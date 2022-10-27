@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import requests
 import telegram
 
+from loguru import logger
+
 
 URL = "https://dvmn.org/api/long_polling/"
 
@@ -25,12 +27,10 @@ if __name__ == "__main__":
             )
             response.raise_for_status()
             check_lesson_params = response.json()
-            timestamp = check_lesson_params.get(
-                "timestamp_to_request",
-                "last_attempt_timestamp"
-            )
+            timestamp = check_lesson_params.get("timestamp_to_request")
             status = check_lesson_params.get("status")
             if status == "found":
+                timestamp = check_lesson_params["last_attempt_timestamp"]
                 attempts = check_lesson_params["new_attempts"][0]
                 remark = attempts["is_negative"]
                 lesson_url = attempts["lesson_url"]
@@ -50,6 +50,7 @@ if __name__ == "__main__":
             params = {
                 "timestamp": timestamp
             }
+            logger.info(timestamp)
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
