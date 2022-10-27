@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 import requests
 import telegram
 
-from loguru import logger
-
 
 URL = "https://dvmn.org/api/long_polling/"
 
@@ -50,7 +48,6 @@ if __name__ == "__main__":
             params = {
                 "timestamp": timestamp
             }
-            logger.info(timestamp)
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
