@@ -22,11 +22,14 @@ if __name__ == "__main__":
     try: 
         while True:
             response = requests.get(
-                URL, autorization_header, params
+                URL, headers=autorization_header, params=params
             )
             response.raise_for_status()
             check_lesson_params = response.json()
-            timestamp = check_lesson_params.get("timestamp_to_request")
+            timestamp = check_lesson_params.get(
+                "timestamp_to_request",
+                "last_attempt_timestamp"
+            )
             status = check_lesson_params.get("status")
             if status == "found":
                 remark = check_lesson_params["new_attempts"][0]["is_negative"]
