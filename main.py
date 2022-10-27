@@ -25,7 +25,6 @@ if __name__ == "__main__":
         "timestamp": "" 
     }
     bot = telegram.Bot(token=str(os.getenv("TG_TOKEN")))
-    updates = bot.get_updates()
     try: 
         while True:
             response = get_devman_rewiews_status(
