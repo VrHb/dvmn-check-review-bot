@@ -40,13 +40,13 @@ if __name__ == "__main__":
                 if remark:
                     bot.send_message(
                         text=f"Преподаватель проверил работу *{lesson}* {lesson_url}\n\n К сожалению, в работе нашлись ошибки!",
-                        chat_id=os.getenv("CHAT_ID"),
-                        parse_mode="MArkdown"
+                        chat_id=os.getenv("TG_CHAT_ID"),
+                        parse_mode="Markdown"
                         )
                 else:
                     bot.send_message(
                         text=f"Преподаватель проверил работу *{lesson}* {lesson_url}\n\n Преподавателю все понравилось, можно приступать к следующему уроку!",
-                        chat_id=os.getenv("CHAT_ID"),
+                        chat_id=os.getenv("TG_CHAT_ID"),
                         parse_mode="Markdown"
                         )
             params = {
