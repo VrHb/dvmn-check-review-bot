@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 import requests
 import telegram
 
-from loguru import logger
 
 URL = "https://dvmn.org/api/long_polling/"
 
@@ -19,10 +18,10 @@ if __name__ == "__main__":
         "timestamp": "" 
     }
     bot = telegram.Bot(token=str(os.getenv("TG_TOKEN")))
-    try: 
-        while True:
+    while True:
+        try:
             response = requests.get(
-                URL, headers=autorization_header, params=params
+                URL, headers=autorization_header, params=params, timeout=10
             )
             response.raise_for_status()
             check_lesson_params = response.json()
@@ -32,9 +31,10 @@ if __name__ == "__main__":
             )
             status = check_lesson_params.get("status")
             if status == "found":
-                remark = check_lesson_params["new_attempts"][0]["is_negative"]
-                lesson_url = check_lesson_params["new_attempts"][0]["lesson_url"]
-                lesson = check_lesson_params["new_attempts"][0]["lesson_title"]
+                attempts = check_lesson_params["new_attempts"][0]
+                remark = attempts["is_negative"]
+                lesson_url = attempts["lesson_url"]
+                lesson = attempts["lesson_title"]
                 if remark:
                     bot.send_message(
                         text=f"Преподаватель проверил работу *{lesson}* {lesson_url}\n\n К сожалению, в работе нашлись ошибки!",
@@ -47,11 +47,10 @@ if __name__ == "__main__":
                         chat_id=os.getenv("TG_CHAT_ID"),
                         parse_mode="Markdown"
                         )
-            logger.info(timestamp)
             params = {
                 "timestamp": timestamp
             }
-    except requests.exceptions.ReadTimeout:
-        time.sleep(20)
-    except requests.exceptions.ConnectionError:
-        time.sleep(60)
+        except requests.exceptions.ReadTimeout:
+            continue
+        except requests.exceptions.ConnectionError:
+            time.sleep(60)
