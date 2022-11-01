@@ -2,6 +2,7 @@ import os
 import time
 
 from dotenv import load_dotenv
+from loguru import logger
 import requests
 import telegram
 
@@ -18,6 +19,7 @@ if __name__ == "__main__":
         "timestamp": "" 
     }
     bot = telegram.Bot(token=str(os.getenv("TG_TOKEN")))
+    logger.info(bot)
     while True:
         try:
             response = requests.get(
