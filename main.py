@@ -1,13 +1,26 @@
 import os
 import time
+import logging
 
 from dotenv import load_dotenv
-from loguru import logger
 import requests
 import telegram
 
 
+logger = logging.getLogger('Logger')
+
 URL = "https://dvmn.org/api/long_polling/"
+
+class TgbotLogger(logging.Handler):
+    
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
 if __name__ == "__main__":
@@ -19,7 +32,10 @@ if __name__ == "__main__":
         "timestamp": "" 
     }
     bot = telegram.Bot(token=str(os.getenv("TG_TOKEN")))
-    logger.info(bot)
+    logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s")
+    logger.addHandler(TgbotLogger(bot, os.getenv("TG_CHAT_ID")))
+    if bot:
+        logger.warning("Бот запущен!")
     while True:
         try:
             response = requests.get(
@@ -52,5 +68,6 @@ if __name__ == "__main__":
             }
         except requests.exceptions.ReadTimeout:
             continue
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Бот упал с ошибкой:\n{e}")
             time.sleep(60)
