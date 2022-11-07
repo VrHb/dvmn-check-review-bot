@@ -36,8 +36,7 @@ def main():
     bot_logger = TgbotLogger(logger_bot, os.getenv("TG_CHAT_ID"))
     logger.addHandler(bot_logger)
     logging.basicConfig(format="%(asctime)s %(lineno)d %(message)s")
-    if bot:
-        logger.warning("Бот запущен!")
+    logger.warning("Бот запущен!")
     while True:
         try:
             response = requests.get(
