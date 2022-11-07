@@ -6,13 +6,21 @@ from dotenv import load_dotenv
 import requests
 import telegram
 
-from logger_bot import create_logger_bot 
-
 
 logger = logging.getLogger("botlog")
 
 URL = "https://dvmn.org/api/long_polling/"
 
+class TgbotLogger(logging.Handler):
+    
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 def main():
     load_dotenv()
@@ -23,7 +31,10 @@ def main():
         "timestamp": "" 
     }
     bot = telegram.Bot(token=str(os.getenv("TG_TOKEN")))
-    create_logger_bot()
+    logger_bot = telegram.Bot(token=str(os.getenv("TG_LOGGER_TOKEN")))
+    logger.setLevel(logging.WARNING)
+    bot_logger = TgbotLogger(logger_bot, os.getenv("TG_CHAT_ID"))
+    logger.addHandler(bot_logger)
     logging.basicConfig(format="%(asctime)s %(lineno)d %(message)s")
     if bot:
         logger.warning("Бот запущен!")
